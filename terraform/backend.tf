@@ -5,18 +5,16 @@
 # Cac gia tri thuc te duoc truyen dong vao qua scripts/init.sh.
 #
 # De biet state dang duoc luu o dau, chay:
-#   terraform remote state list
-# Hoac xem cau hinh hien tai sau khi init:
 #   cat .terraform/terraform.tfstate
 #
 # -----------------------------------------------------------
 # Thong tin backend (sau khi chay bootstrap.sh):
 #
-#   S3 Bucket      : cdo08-terraform-state-{AWS_ACCOUNT_ID}
-#   Region         : ap-southeast-2
-#   State Key      : {environment}/main/terraform.tfstate
-#   DynamoDB Table : cdo08-terraform-locks
-#   Encryption     : AES256
+#   S3 Bucket  : cdo08-terraform-state-{AWS_ACCOUNT_ID}
+#   Region     : ap-southeast-2
+#   State Key  : {environment}/main/terraform.tfstate
+#   Locking    : S3 native lockfile (use_lockfile=true, yeu cau Terraform >= 1.10)
+#   Encryption : AES256
 #
 # Vi du state file cho tung moi truong:
 #   dev  -> s3://cdo08-terraform-state-{account_id}/dev/main/terraform.tfstate

@@ -1,23 +1,25 @@
 # ============================================================
-# Bootstrap: Tạo S3 bucket + DynamoDB table cho Terraform backend
-# Chạy 1 lần bởi Admin trước khi team bắt đầu sử dụng.
+# Bootstrap: Tao S3 bucket cho Terraform backend
+# Chay 1 lan boi Admin truoc khi team bat dau su dung.
+#
+# State locking: dung S3 native lockfile (use_lockfile=true)
+# khong can DynamoDB nua ke tu Terraform >= 1.10
 # ============================================================
 
 data "aws_caller_identity" "current" {}
 
 locals {
-  account_id   = data.aws_caller_identity.current.account_id
-  bucket_name  = "${var.project_name}-terraform-state-${local.account_id}"
-  table_name   = "${var.project_name}-terraform-locks"
+  account_id  = data.aws_caller_identity.current.account_id
+  bucket_name = "${var.project_name}-terraform-state-${local.account_id}"
 }
 
 # -----------------------------------------------------------
-# S3 Bucket — lưu Terraform state files
+# S3 Bucket — luu Terraform state files
 # -----------------------------------------------------------
 resource "aws_s3_bucket" "terraform_state" {
   bucket = local.bucket_name
 
-  # Ngăn xóa nhầm bucket khi có state files
+  # Ngan xoa nham bucket khi co state files
   lifecycle {
     prevent_destroy = true
   }
@@ -27,7 +29,7 @@ resource "aws_s3_bucket" "terraform_state" {
   }
 }
 
-# Bật versioning — cho phép rollback state file nếu bị hỏng
+# Bat versioning — cho phep rollback state file neu bi hong
 resource "aws_s3_bucket_versioning" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
@@ -36,7 +38,7 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
   }
 }
 
-# Mã hoá state files khi lưu trữ
+# Ma hoa state files khi luu tru
 resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
@@ -47,7 +49,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" 
   }
 }
 
-# Chặn mọi public access vào bucket
+# Chan moi public access vao bucket
 resource "aws_s3_bucket_public_access_block" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
 
@@ -58,29 +60,12 @@ resource "aws_s3_bucket_public_access_block" "terraform_state" {
 }
 
 # -----------------------------------------------------------
-# DynamoDB Table — State locking (tránh concurrent apply)
-# -----------------------------------------------------------
-resource "aws_dynamodb_table" "terraform_locks" {
-  name         = local.table_name
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
-
-  tags = {
-    Name = local.table_name
-  }
-}
-
-# -----------------------------------------------------------
-# IAM Policy — Cấp quyền cho team members truy cập backend
+# IAM Policy — Cap quyen cho team members truy cap backend
+# Chi can quyen S3 — khong can DynamoDB nua
 # -----------------------------------------------------------
 resource "aws_iam_policy" "terraform_state_access" {
   name        = "${var.project_name}-terraform-state-access"
-  description = "Allows IAM users to read/write Terraform state on S3 and lock via DynamoDB"
+  description = "Allows IAM users to read/write Terraform state on S3 (locking via S3 native lockfile)"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -100,27 +85,16 @@ resource "aws_iam_policy" "terraform_state_access" {
           "s3:DeleteObject"
         ]
         Resource = ["${aws_s3_bucket.terraform_state.arn}/*"]
-      },
-      {
-        Sid    = "DynamoDBLock"
-        Effect = "Allow"
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:DeleteItem",
-          "dynamodb:DescribeTable"
-        ]
-        Resource = [aws_dynamodb_table.terraform_locks.arn]
       }
     ]
   })
 }
 
-# Attach policy cho các IAM users/roles được chỉ định
+# Attach policy cho cac IAM users/roles duoc chi dinh
 resource "aws_iam_user_policy_attachment" "terraform_state_access" {
   for_each = toset(var.additional_iam_arns)
 
-  # Lấy username từ ARN (arn:aws:iam::123456789012:user/alice → alice)
+  # Lay username tu ARN (arn:aws:iam::123456789012:user/alice → alice)
   user       = split("/", each.value)[1]
   policy_arn = aws_iam_policy.terraform_state_access.arn
 }

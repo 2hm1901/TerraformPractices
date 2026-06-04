@@ -8,27 +8,22 @@ output "state_bucket_arn" {
   value       = aws_s3_bucket.terraform_state.arn
 }
 
-output "dynamodb_table_name" {
-  description = "Name of the DynamoDB table used for state locking"
-  value       = aws_dynamodb_table.terraform_locks.name
-}
-
 output "iam_policy_arn" {
   description = "ARN of the IAM policy to attach to team members"
   value       = aws_iam_policy.terraform_state_access.arn
 }
 
 output "backend_config" {
-  description = "Copy this into your backend.tf file"
+  description = "Thong tin backend de tham khao. Gia tri thuc te duoc truyen vao qua scripts/init.sh"
   value = <<-EOT
-    terraform {
-      backend "s3" {
-        bucket         = "${aws_s3_bucket.terraform_state.id}"
-        key            = "{environment}/{component}/terraform.tfstate"
-        region         = "${var.aws_region}"
-        dynamodb_table = "${aws_dynamodb_table.terraform_locks.name}"
-        encrypt        = true
-      }
-    }
+    S3 Bucket  : ${aws_s3_bucket.terraform_state.id}
+    Region     : ${var.aws_region}
+    Locking    : S3 native lockfile (use_lockfile=true)
+    State Key (dev)  : dev/main/terraform.tfstate
+    State Key (prod) : prod/main/terraform.tfstate
+
+    Chay lenh sau de ket noi:
+      bash scripts/init.sh dev
+      bash scripts/init.sh prod
   EOT
 }

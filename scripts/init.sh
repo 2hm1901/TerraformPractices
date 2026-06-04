@@ -45,15 +45,16 @@ cd "$TERRAFORM_DIR"
 
 echo ""
 echo "Initializing Terraform voi S3 backend..."
-terraform init \
+terraform init -reconfigure \
   -backend-config="bucket=$BUCKET_NAME" \
   -backend-config="key=$ENV/main/terraform.tfstate" \
   -backend-config="region=$REGION" \
-  -backend-config="dynamodb_table=cdo08-terraform-locks" \
+  -backend-config="use_lockfile=true" \
   -backend-config="encrypt=true"
 
 echo ""
-echo "Init hoan tat! Co the bat dau su dung:"
+echo "Init hoan tat! Chay cac lenh sau:"
 echo ""
+echo "  cd terraform"
 echo "  terraform plan  -var-file=environments/$ENV.tfvars"
 echo "  terraform apply -var-file=environments/$ENV.tfvars"
