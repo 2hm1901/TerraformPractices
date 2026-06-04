@@ -1,0 +1,35 @@
+# Terraform files
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Environment-specific var files (có thể chứa secrets)
+*.auto.tfvars
+secrets.tfvars
+*.secrets.tfvars
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# AI tools
+GEMINI.md
+.antigravitycli/
