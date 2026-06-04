@@ -43,3 +43,30 @@ terraform apply -var-file=environments/dev.tfvars
 - **KHONG** xoa DynamoDB table khi dang co nguoi apply
 - Luon chay `terraform plan` truoc khi `apply`
 - Chay `terraform destroy` rat nguy hiem — chi dung o dev
+
+## Project Structure
+```
+CDO08/
+├── terraform/
+│   ├── bootstrap/           # One-time setup: creates S3 bucket + DynamoDB table
+│   ├── modules/
+│   │   ├── networking/      # VPC, subnets, IGW, route tables
+│   │   └── data/            # S3, DynamoDB, RDS (storage resources)
+│   ├── environments/        # Per-environment variable files
+│   │   ├── dev.tfvars
+│   │   └── prod.tfvars
+│   ├── main.tf              # Root module — calls all modules
+│   ├── providers.tf         # AWS provider config
+│   ├── backend.tf           # S3 remote backend config
+│   ├── variables.tf         # Input variables
+│   ├── outputs.tf           # Output values
+│   └── versions.tf          # Provider version constraints
+├── scripts/
+│   ├── bootstrap.sh         # Run once to set up backend infrastructure
+│   └── init.sh              # Run by each user to initialize Terraform
+├── docs/
+│   ├── README.md
+│   ├── architecture.md
+│   ├── onboarding.md        # How new users get access
+│   └── requirements.md
+```
