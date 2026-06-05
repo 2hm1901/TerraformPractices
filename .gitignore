@@ -30,6 +30,10 @@ Thumbs.db
 # Logs
 *.log
 
+# Generated lab secrets/configs
+ssh_private_key.pem
+kubeconfig.yaml
+
 # AI tools
 GEMINI.md
 .antigravitycli/
