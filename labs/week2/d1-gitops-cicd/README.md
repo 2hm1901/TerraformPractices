@@ -27,9 +27,9 @@ d1-gitops-cicd/
     service.yaml
   argocd/
     application.yaml
-  .github/
+  ../../.github/
     workflows/
-      validate-pr.yaml
+      validate-d1-pr.yaml
 ```
 
 ## 1. Chuan bi Minikube
@@ -67,7 +67,7 @@ Truy cap `https://localhost:8080`, user la `admin`.
 Sua `argocd/application.yaml`:
 
 - Doi `repoURL` thanh URL GitHub repo cua ban.
-- Giu `path: week2/d1-gitops-cicd/manifests` neu repo nay duoc push nguyen cau truc.
+- Giu `path: labs/week2/d1-gitops-cicd/manifests` neu repo nay duoc push nguyen cau truc.
 
 Apply ArgoCD Application:
 
@@ -92,11 +92,11 @@ kubectl -n d1-gitops get deploy,svc,pod
 
 ## 4. Validate manifest khi Pull Request
 
-Workflow `.github/workflows/validate-pr.yaml` se chay khi Pull Request thay doi file trong `week2/d1-gitops-cicd`.
+Workflow `.github/workflows/validate-d1-pr.yaml` se chay khi Pull Request thay doi file trong `labs/week2/d1-gitops-cicd`.
 
 Workflow gom:
 
-- `kubectl kustomize week2/d1-gitops-cicd/manifests`
+- `kubectl kustomize labs/week2/d1-gitops-cicd/manifests`
 - Kiem tra schema/server-side co the chay local khi da co Minikube
 
 Trong GitHub-hosted runner thuong khong co cluster Kubernetes, vi vay lab nay mac dinh render manifest offline bang Kustomize. Neu muon validate day du hon, chay lenh sau tren may local khi Minikube dang chay:

@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/2hm1901/TerraformPractices.git
     targetRevision: main
-    path: week2/d1-gitops-cicd/manifests
+    path: labs/week2/d1-gitops-cicd/manifests
   destination:
     server: https://kubernetes.default.svc
     namespace: d1-gitops

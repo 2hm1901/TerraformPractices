@@ -3,7 +3,7 @@ name: Validate D1 Kubernetes manifests
 on:
   pull_request:
     paths:
-      - "week2/d1-gitops-cicd/**"
+      - "labs/week2/d1-gitops-cicd/**"
 
 jobs:
   validate:
@@ -16,4 +16,4 @@ jobs:
         uses: azure/setup-kubectl@v4
 
       - name: Render Kubernetes manifests
-        run: kubectl kustomize week2/d1-gitops-cicd/manifests
+        run: kubectl kustomize labs/week2/d1-gitops-cicd/manifests
