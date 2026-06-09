@@ -1,0 +1,19 @@
+name: Validate D1 Kubernetes manifests
+
+on:
+  pull_request:
+    paths:
+      - "week2/d1-gitops-cicd/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Render Kubernetes manifests
+        run: kubectl kustomize week2/d1-gitops-cicd/manifests
